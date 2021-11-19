@@ -1,0 +1,53 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.bookingSlotsWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center
+}
+
+.bookingSlot {
+  cursor: pointer;
+  border: black 1px solid;
+  width: 20rem;
+}
+
+.selected {
+  background: green;
+}
+
+.available {
+  background: #ffffff;
+}
+
+.booked {
+  background: yellow;
+  cursor: default;
+}
+
+.unavailable {
+  background: red;
+  cursor: default;
+}
+
+.selectionWrapper {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.bookedSlotsWrapper {
+  width: 100%;
+  margin-bottom: 2rem;
+}
