@@ -93,38 +93,36 @@ class TimeSlots extends React.Component {
         })
     }
 
-    HandleSelectionClick (object) {
-        this.setState({updateState: true})
-        if (object.bookingStatus === "unavailable" || object.bookingStatus === "booked") {
-            // Do nothing as this slot cannot be booked
-        }
-        else if (object.bookingStatus === "selected") {
-            if (object.slotId !== this.state.selectedSlots[0].slotId &&
-                object.slotId !== this.state.selectedSlots[this.state.selectedSlots.length-1].slotId) {
-                alert("You can only deselect the first or last selected time slot!")
-            } 
-            else {
-                object.bookingStatus = "available"
-                this.setState({selectedSlots: this.state.selectedSlots.filter(slots => slots.slotId !== object.slotId)})
+    HandleSelectionClick(object) {
+        this.setState({ updateState: true }, () => {
+            if (object.bookingStatus === "unavailable" || object.bookingStatus === "booked") {
+                // Do nothing as this slot cannot be booked
+            } else if (object.bookingStatus === "selected") {
+                if (
+                    object.slotId !== this.state.selectedSlots[0].slotId &&
+                    object.slotId !== this.state.selectedSlots[this.state.selectedSlots.length - 1].slotId
+                ) {
+                    alert("You can only deselect the first or last selected time slot!");
+                } else {
+                    this.setState((prevState) => ({
+                        selectedSlots: prevState.selectedSlots.filter((slots) => slots.slotId !== object.slotId),
+                    }));
+                }
+            } else {
+                if (this.state.selectedSlots.length === 0) {
+                    this.setState({ selectedSlots: [object] });
+                } else if (
+                    object.slotId !== this.state.selectedSlots[0].slotId - 1 &&
+                    object.slotId !== this.state.selectedSlots[this.state.selectedSlots.length - 1].slotId + 1
+                ) {
+                    alert("You must select an adjacent time slot to those already selected!");
+                } else {
+                    this.setState((prevState) => ({
+                        selectedSlots: [...prevState.selectedSlots, object].sort((a, b) => a.slotId - b.slotId),
+                    }));
+                }
             }
-        }
-        else {
-            if (this.state.selectedSlots.length === 0) {
-                object.bookingStatus = "selected"
-                this.setState({selectedSlots: [ object ]})
-            }
-            else if (object.slotId !== this.state.selectedSlots[0].slotId-1 &&
-                object.slotId !== this.state.selectedSlots[this.state.selectedSlots.length-1].slotId+1) {
-                alert("You must select an adjacent time slot to those already selected!")
-            }
-            else {
-                object.bookingStatus = "selected"
-                this.state.selectedSlots.push(object)
-                this.state.selectedSlots.sort((a, b) => {
-                    return a.slotId-b.slotId
-                })
-            }
-        }
+        });
     }
 
     HandleReturnSlotsClick(slotArray) {
@@ -227,13 +225,13 @@ class TimeSlots extends React.Component {
                     </div>
                 }
                 <div className={"bookingSlotsWrapper"}>
-                    {this.state.bookingSlots.map((slot, i) => {
-                        return <div key={i} className={"bookingSlot " + slot.bookingStatus} onClick={() => this.HandleSelectionClick(slot)}>
+                    {this.state.bookingSlots.map((slot) => (
+                        <div key={slot.slotId} className={"bookingSlot " + slot.bookingStatus} onClick={() => this.HandleSelectionClick(slot)}>
                             <div>{`${slot.startTime} - ${slot.endTime}`}</div>
                         </div>
-                    })}
+                    ))}
                 </div>
-                
+
             </React.Fragment>
         )
     }
