@@ -1,0 +1,6 @@
+-> setup a database
+-> Record information more persistently in the DB
+-> routes pulled into routes folder
+-> controller logic
+-> separate the start server and server config logic
+-> more authentication and logging
