@@ -4,3 +4,10 @@
 -> controller logic
 -> separate the start server and server config logic
 -> more authentication and logging
+
+--------
+
+Additional things possible
+- server side validation for timeslots
+- concurrency control
+- notification and messaging
