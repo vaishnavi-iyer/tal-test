@@ -127,19 +127,6 @@ class TimeSlots extends React.Component {
         }
     }
 
-    HandleConfirmClick() {
-        this.setState({bookingSlots: this.state.bookingSlots.map(slot => {
-            let newSlot = slot
-            if (slot.bookingStatus === "selected") {
-                newSlot.bookingStatus = "booked"
-            }
-            return newSlot
-        }),
-            bookedSlots: [...this.state.bookedSlots, this.state.selectedSlots],
-            selectedSlots: []
-        })
-    }
-
     HandleReturnSlotsClick(slotArray) {
         this.setState({bookingSlots: this.state.bookingSlots.map(bookingSlot => {
             let newSlot = bookingSlot
@@ -150,6 +137,65 @@ class TimeSlots extends React.Component {
         }),
             bookedSlots: this.state.bookedSlots.filter(bookedSlot => slotArray !== bookedSlot )
         })
+    }
+
+    // Handle booking on the backend
+    async bookSlotOnBackend(selectedSlots) {
+        try {
+            const response = await fetch('http://localhost:5000/api/bookSlot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ selectedSlots }),
+            });
+
+            if (response.ok) {
+                // Update the frontend state or perform other actions
+                console.log('Booking successful');
+            } else {
+                console.error('Booking failed');
+            }
+        } catch (error) {
+            console.error('Error booking slot:', error);
+        }
+    }
+
+
+    // Modified method to handle booking confirmation
+    async HandleConfirmClick() {
+        await this.bookSlotOnBackend(this.state.selectedSlots);
+
+        this.setState({
+            bookingSlots: this.state.bookingSlots.map((slot) => {
+                if (this.state.selectedSlots.some((selectedSlot) => selectedSlot.slotId === slot.slotId)) {
+                    return { ...slot, bookingStatus: 'booked' };
+                }
+                return slot;
+            }),
+            bookedSlots: [...this.state.bookedSlots, this.state.selectedSlots],
+            selectedSlots: [],
+        });
+    }
+
+    // New method to fetch booked slots from the backend
+    async fetchBookedSlots() {
+        try {
+            const response = await fetch('http://localhost:5000/api/bookingSlots');
+            if (response.ok) {
+                const data = await response.json();
+                this.setState({ bookedSlots: data });
+            } else {
+                console.error('Failed to fetch booked slots');
+            }
+        } catch (error) {
+            console.error('Error fetching booked slots:', error);
+        }
+    }
+
+    // New lifecycle method to fetch booked slots when the component mounts
+    async componentDidMount() {
+        await this.fetchBookedSlots();
     }
 
     render() {
@@ -168,9 +214,9 @@ class TimeSlots extends React.Component {
                 {this.state.bookedSlots.length > 0 &&
                     <div className={"bookedSlotsWrapper"}>
                         <h2>{"Booked Times"}</h2>
-                        {this.state.bookedSlots.map(slotArray => {
+                        {this.state.bookedSlots.map((slotArray, i) => {
                             return (
-                                <div>
+                                <div key={i}>
                                     <div>
                                         {`Start Time: ${slotArray[0].startTime} - End Time: ${slotArray[slotArray.length-1].endTime} `}
                                         <button onClick={() => this.HandleReturnSlotsClick(slotArray)}>{"Return Booking"}</button>
@@ -181,8 +227,8 @@ class TimeSlots extends React.Component {
                     </div>
                 }
                 <div className={"bookingSlotsWrapper"}>
-                    {this.state.bookingSlots.map((slot) => {
-                        return <div className={"bookingSlot " + slot.bookingStatus} onClick={() => this.HandleSelectionClick(slot)}>
+                    {this.state.bookingSlots.map((slot, i) => {
+                        return <div key={i} className={"bookingSlot " + slot.bookingStatus} onClick={() => this.HandleSelectionClick(slot)}>
                             <div>{`${slot.startTime} - ${slot.endTime}`}</div>
                         </div>
                     })}
